@@ -11,8 +11,8 @@ import Link from "next/link";
 import { ArrowRight, Code2, BookOpen } from "lucide-react";
 
 const trackIcon: Record<string, React.ReactNode> = {
-  mern: <Code2 size={18} className="text-violet-400" />,
-  dsa: <BookOpen size={18} className="text-violet-400" />,
+  mern: <Code2 size={18} className="text-violet-500" />,
+  dsa: <BookOpen size={18} className="text-violet-500" />,
 };
 
 export default function DashboardPage() {
@@ -32,7 +32,7 @@ export default function DashboardPage() {
           Welcome back, {user?.name?.split(" ")[0]}
         </h2>
         <p className="text-sm text-zinc-500 mt-0.5 capitalize">
-          {user?.experienceLevel} track
+          {user?.experienceLevel} level
         </p>
       </div>
 
@@ -41,7 +41,7 @@ export default function DashboardPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Overall Progress</CardTitle>
-            <span className="text-2xl font-bold text-violet-400">
+            <span className="text-2xl font-bold text-violet-500">
               {data?.overallPercent ?? 0}%
             </span>
           </div>
@@ -75,7 +75,7 @@ export default function DashboardPage() {
               {/* Current section */}
               {t.sections?.find((s) => !s.isCompleted) && (
                 <div className="bg-zinc-950 rounded-lg px-3 py-2.5 mb-3">
-                  <p className="text-xs text-zinc-500 mb-0.5">Current</p>
+                  <p className="text-xs text-zinc-500 mb-0.5">Continue with</p>
                   <p className="text-xs font-medium text-zinc-300 truncate">
                     {t.sections.find((s) => !s.isCompleted)?.title}
                   </p>
