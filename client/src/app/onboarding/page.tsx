@@ -34,7 +34,6 @@ export default function OnboardingPage() {
   const { user, loading: authLoading, setUser } = useAuth();
   const router = useRouter();
 
-  // Guard: no token → login; already onboarded → dashboard
   if (!authLoading && !user) {
     router.replace("/login");
     return null;
@@ -60,7 +59,12 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-xl font-bold text-zinc-100">What&apos;s your experience level?</h1>
+          <h1 className="text-xl font-bold text-zinc-100">
+            Dev<span className="text-violet-500">Ladder</span>
+          </h1>
+          <p className="text-base font-semibold text-zinc-100 mt-4">
+            What&apos;s your experience level?
+          </p>
           <p className="text-sm text-zinc-500 mt-1">This determines your starting roadmap.</p>
         </div>
 
@@ -72,7 +76,7 @@ export default function OnboardingPage() {
               className={cn(
                 "w-full text-left p-4 rounded-xl border transition-colors",
                 selected === level.id
-                  ? "border-violet-600 bg-violet-600/10"
+                  ? "border-violet-600 bg-violet-900"
                   : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
               )}
             >
