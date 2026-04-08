@@ -9,24 +9,9 @@ import { cn } from "@/lib/utils";
 import { CheckCircle2, XCircle, ChevronRight, ChevronLeft, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-type Question = {
-  _id: string;
-  question: string;
-  options: string[];
-};
-
-type TestData = {
-  _id: string;
-  title: string;
-  questions: Question[];
-};
-
-type SubmitResult = {
-  passed: boolean;
-  score: number;
-  correctCount: number;
-  totalQuestions: number;
-};
+type Question = { _id: string; question: string; options: string[] };
+type TestData = { _id: string; title: string; questions: Question[] };
+type SubmitResult = { passed: boolean; score: number; correctCount: number; totalQuestions: number };
 
 export default function TestPage({
   params,
@@ -58,6 +43,7 @@ export default function TestPage({
       setResult(data);
       queryClient.invalidateQueries({ queryKey: ["sections"] });
       queryClient.invalidateQueries({ queryKey: ["progress-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["attempts", test?._id] });
     },
   });
 
@@ -73,11 +59,11 @@ export default function TestPage({
   // ── Result screen ───────────────────────────────────────────
   if (result) {
     return (
-      <div className="max-w-md mx-auto mt-12 text-center space-y-6">
+      <div className="max-w-md mx-auto mt-8 sm:mt-12 text-center space-y-6 px-4">
         {result.passed ? (
           <CheckCircle2 size={48} className="mx-auto text-green-400" />
         ) : (
-          <XCircle size={48} className="mx-auto text-red-400" />
+          <XCircle size={48} className="mx-auto text-zinc-500" />
         )}
 
         <div>
@@ -92,11 +78,16 @@ export default function TestPage({
         </div>
 
         {/* Score ring */}
-        <div className="inline-flex items-center justify-center w-28 h-28 rounded-full border-4 border-zinc-800 relative">
+        <div
+          className={cn(
+            "inline-flex items-center justify-center w-28 h-28 rounded-full border-4",
+            result.passed ? "border-green-800" : "border-zinc-800"
+          )}
+        >
           <span
             className={cn(
               "text-2xl font-bold",
-              result.passed ? "text-green-400" : "text-red-400"
+              result.passed ? "text-green-400" : "text-zinc-400"
             )}
           >
             {result.score}%
@@ -107,11 +98,9 @@ export default function TestPage({
           {result.correctCount} / {result.totalQuestions} correct
         </p>
 
-        <div className="flex gap-3 justify-center">
+        <div className="flex gap-3 justify-center flex-wrap">
           <Link href={`/track/${slug}/section/${id}`}>
-            <Button variant="secondary" size="sm">
-              Back to section
-            </Button>
+            <Button variant="secondary" size="sm">Back to section</Button>
           </Link>
           {result.passed && (
             <Link href={`/track/${slug}`}>
@@ -150,7 +139,7 @@ export default function TestPage({
             key={q._id}
             onClick={() => setCurrent(i)}
             className={cn(
-              "w-2 h-2 rounded-full transition-colors",
+              "w-2.5 h-2.5 rounded-full transition-colors",
               i === current
                 ? "bg-violet-500"
                 : answers[q._id] !== undefined
@@ -173,13 +162,11 @@ export default function TestPage({
               className={cn(
                 "w-full text-left text-sm px-4 py-3 rounded-lg border transition-colors",
                 answers[q._id] === idx
-                  ? "border-violet-600 bg-violet-600/15 text-violet-300"
+                  ? "border-violet-600 bg-violet-900 text-violet-300"
                   : "border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
               )}
             >
-              <span className="font-medium mr-2">
-                {["A", "B", "C", "D"][idx]}.
-              </span>
+              <span className="font-medium mr-2">{["A", "B", "C", "D"][idx]}.</span>
               {option}
             </button>
           ))}
@@ -187,7 +174,7 @@ export default function TestPage({
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <Button
           variant="ghost"
           size="sm"
@@ -195,7 +182,7 @@ export default function TestPage({
           onClick={() => setCurrent((p) => p - 1)}
         >
           <ChevronLeft size={16} />
-          Previous
+          Prev
         </Button>
 
         {current < totalQ - 1 ? (
@@ -220,7 +207,7 @@ export default function TestPage({
       </div>
 
       {submit.isError && (
-        <p className="text-xs text-red-400 text-center">
+        <p className="text-xs text-red-400 text-center bg-red-950/30 border border-red-900/50 rounded-lg px-3 py-2">
           {(submit.error as { response?: { data?: { message?: string } } })?.response?.data
             ?.message ?? "Submission failed. Try again."}
         </p>
