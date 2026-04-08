@@ -1,36 +1,162 @@
 @import "tailwindcss";
 
-:root {
-  --background: #09090b;
-  --surface: #18181b;
-  --surface-2: #27272a;
-  --border: #3f3f46;
-  --text-primary: #fafafa;
-  --text-muted: #a1a1aa;
-  --accent: #8b5cf6;
-  --accent-hover: #7c3aed;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --error: #ef4444;
+/* ─────────────────────────────────────────────────────────────
+   Theme tokens — dark (default) and light
+   Approach: CSS vars change per theme; @theme inline exposes
+   them as Tailwind utilities via var() references.
+   ───────────────────────────────────────────────────────────── */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* 60% – backgrounds */
+  --_zinc-950: #0d1b22;
+  --_zinc-900: #1a2f38;
+  --_zinc-800: #264653;
+  --_zinc-700: #2e5566;
+  --_zinc-600: #3a7080;
+  --_zinc-500: #528888;
+  --_zinc-400: #8ab8b8;
+  --_zinc-300: #b0d5d5;
+  --_zinc-200: #d0eaea;
+  --_zinc-100: #f0f7f7;
+
+  /* 30% – teal brand */
+  --_teal:     #2A9D8F;
+  --_teal-dim: rgba(42, 157, 143, 0.12);
+
+  /* 10% – golden accent */
+  --_accent:     #E9C46A;
+  --_accent-2:   #c9a050;
+  --_accent-dim: rgba(233, 196, 106, 0.12);
+
+  /* violet → accent */
+  --_v-950: rgba(233, 196, 106, 0.07);
+  --_v-900: rgba(233, 196, 106, 0.14);
+  --_v-700: #b08030;
+  --_v-600: #c99a30;
+  --_v-500: #E9C46A;
+  --_v-400: #f0d090;
+  --_v-300: #f5e0b0;
+
+  /* green → teal */
+  --_g-950: rgba(42, 157, 143, 0.08);
+  --_g-900: rgba(42, 157, 143, 0.15);
+  --_g-800: rgba(42, 157, 143, 0.25);
+  --_g-400: #2A9D8F;
+  --_g-300: #4db8a8;
+
+  /* status */
+  --_success: #2A9D8F;
+  --_error:   #f87171;
+  --_warning: #fbbf24;
 }
 
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* 60% – backgrounds (inverted zinc scale) */
+  --_zinc-950: #eef8f7;
+  --_zinc-900: #ffffff;
+  --_zinc-800: #f0faf8;
+  --_zinc-700: #e0f4f2;
+  --_zinc-600: #c8e8e5;
+  --_zinc-500: #5a9090;
+  --_zinc-400: #3a6e6e;
+  --_zinc-300: #264653;
+  --_zinc-200: #1a3a44;
+  --_zinc-100: #0d1b22;
+
+  /* 30% – teal brand (same) */
+  --_teal:     #2A9D8F;
+  --_teal-dim: rgba(42, 157, 143, 0.1);
+
+  /* 10% – darker accent for readability on light bg */
+  --_accent:     #c07a1a;
+  --_accent-2:   #9a5e0e;
+  --_accent-dim: rgba(192, 122, 26, 0.1);
+
+  /* violet → darker for light mode */
+  --_v-950: rgba(192, 122, 26, 0.07);
+  --_v-900: rgba(192, 122, 26, 0.13);
+  --_v-700: #7a4800;
+  --_v-600: #9a6010;
+  --_v-500: #c07a1a;
+  --_v-400: #d4923a;
+  --_v-300: #e0b060;
+
+  /* green → teal (same) */
+  --_g-950: rgba(42, 157, 143, 0.08);
+  --_g-900: rgba(42, 157, 143, 0.14);
+  --_g-800: rgba(42, 157, 143, 0.22);
+  --_g-400: #1f8070;
+  --_g-300: #2A9D8F;
+
+  /* status */
+  --_success: #1f8070;
+  --_error:   #dc2626;
+  --_warning: #d97706;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Tailwind v4 theme extension — expose CSS vars as utilities
+   ───────────────────────────────────────────────────────────── */
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Override zinc palette */
+  --color-zinc-950: var(--_zinc-950);
+  --color-zinc-900: var(--_zinc-900);
+  --color-zinc-800: var(--_zinc-800);
+  --color-zinc-700: var(--_zinc-700);
+  --color-zinc-600: var(--_zinc-600);
+  --color-zinc-500: var(--_zinc-500);
+  --color-zinc-400: var(--_zinc-400);
+  --color-zinc-300: var(--_zinc-300);
+  --color-zinc-200: var(--_zinc-200);
+  --color-zinc-100: var(--_zinc-100);
+
+  /* Override violet → accent */
+  --color-violet-950: var(--_v-950);
+  --color-violet-900: var(--_v-900);
+  --color-violet-700: var(--_v-700);
+  --color-violet-600: var(--_v-600);
+  --color-violet-500: var(--_v-500);
+  --color-violet-400: var(--_v-400);
+  --color-violet-300: var(--_v-300);
+
+  /* Override green → teal success states */
+  --color-green-950: var(--_g-950);
+  --color-green-900: var(--_g-900);
+  --color-green-800: var(--_g-800);
+  --color-green-400: var(--_g-400);
+  --color-green-300: var(--_g-300);
+
+  /* Custom teal utilities */
+  --color-teal-500: var(--_teal);
+  --color-teal-dim: var(--_teal-dim);
+
+  /* Custom accent utilities */
+  --color-accent:     var(--_accent);
+  --color-accent-2:   var(--_accent-2);
+  --color-accent-dim: var(--_accent-dim);
 }
 
-* {
-  box-sizing: border-box;
-}
+/* ─────────────────────────────────────────────────────────────
+   Base
+   ───────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
 
 body {
-  background-color: var(--background);
-  color: var(--text-primary);
+  background-color: var(--_zinc-950);
+  color: var(--_zinc-100);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: #52525b; }
+::-webkit-scrollbar-thumb { background: var(--_zinc-700); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--_teal); }
