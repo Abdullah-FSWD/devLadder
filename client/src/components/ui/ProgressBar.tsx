@@ -19,7 +19,7 @@ export function ProgressBar({ value, className, showLabel = false, size = "md" }
         })}
       >
         <div
-          className="h-full bg-violet-600 rounded-full transition-all duration-500"
+          className="h-full bg-violet-500 rounded-full transition-all duration-500"
           style={{ width: `${clamped}%` }}
         />
       </div>
