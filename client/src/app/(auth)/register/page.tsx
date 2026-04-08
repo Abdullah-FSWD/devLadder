@@ -51,7 +51,7 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-violet-600 transition-colors placeholder:text-zinc-600"
+                className="w-full bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
                 placeholder="Your name"
               />
             </div>
@@ -62,7 +62,7 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-violet-600 transition-colors placeholder:text-zinc-600"
+                className="w-full bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
                 placeholder="you@example.com"
               />
             </div>
@@ -74,13 +74,13 @@ export default function RegisterPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                className="w-full bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-violet-600 transition-colors placeholder:text-zinc-600"
+                className="w-full bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
                 placeholder="Min. 8 characters"
               />
             </div>
 
             {error && (
-              <p className="text-xs text-red-400 bg-red-950/50 border border-red-900 rounded-lg px-3 py-2">
+              <p className="text-xs text-red-400 bg-red-950/50 border border-red-900/50 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
