@@ -87,7 +87,7 @@ function SectionCard({
         isLocked
           ? "border-zinc-800 bg-zinc-900/50 opacity-60 cursor-not-allowed"
           : section.isCompleted
-          ? "border-green-900/50 bg-green-950/20 hover:border-green-800/50"
+          ? "border-green-800 bg-green-950 hover:border-green-700"
           : "border-zinc-800 bg-zinc-900 hover:border-zinc-700 cursor-pointer"
       )}
     >
@@ -99,7 +99,7 @@ function SectionCard({
             ? "bg-zinc-800 text-zinc-600"
             : section.isCompleted
             ? "bg-green-900 text-green-400"
-            : "bg-violet-900/50 text-violet-400"
+            : "bg-violet-900 text-violet-400"
         )}
       >
         {isLocked ? (
@@ -114,10 +114,12 @@ function SectionCard({
       {/* Text */}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-zinc-100 truncate">{section.title}</p>
-        <p className="text-xs text-zinc-500 truncate mt-0.5">{section.description}</p>
+        {section.description && (
+          <p className="text-xs text-zinc-500 truncate mt-0.5">{section.description}</p>
+        )}
       </div>
 
-      {/* Status badge */}
+      {/* Status */}
       <div className="flex items-center gap-2 shrink-0">
         {isLocked && <Badge>Locked</Badge>}
         {section.isCompleted && <Badge variant="success">Done</Badge>}
