@@ -65,7 +65,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const sidebarContent = (
     <aside
       className={cn(
-        "w-64 shrink-0 bg-zinc-900 border-r border-zinc-800 flex flex-col h-screen",
+        // h-[100dvh]: dynamic viewport height — accounts for mobile browser toolbars
+        // (100vh would cut off the footer behind the bottom bar)
+        "w-64 shrink-0 bg-zinc-900 border-r border-zinc-800 flex flex-col h-[100dvh]",
         // Mobile: fixed overlay drawer
         "fixed top-0 left-0 z-40 transition-transform duration-300",
         // Desktop: sticky sidebar (overrides fixed)
@@ -110,8 +112,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="px-3 py-4 border-t border-zinc-800 space-y-1">
+      {/* Footer — pb uses safe-area-inset-bottom so content clears home indicator */}
+      <div
+        className="px-3 pt-4 border-t border-zinc-800 space-y-1"
+        style={{ paddingBottom: "max(16px, env(safe-area-inset-bottom))" }}
+      >
         {/* Level switcher */}
         <div className="relative">
           <button
