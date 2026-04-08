@@ -11,4 +11,5 @@ module.exports = {
   },
   clientUrl: process.env.CLIENT_URL,
   nodeEnv: process.env.NODE_ENV || "development",
+  redisUrl: process.env.REDIS_URL || null,
 };
