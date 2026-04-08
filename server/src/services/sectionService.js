@@ -1,37 +1,49 @@
 const { Section, Topic, Subtopic, TestAttempt } = require("../models");
 const AppError = require("../utils/AppError");
+const cache = require("../utils/cache");
+
+const TTL_SECTIONS = 180; // 3 min — depends on test results
+const TTL_CONTENT  = 3600; // 1 hour — topics/subtopics don't change
 
 /**
  * Returns a section with its topics and subtopics,
  * plus whether it is unlocked for the given user.
  */
 async function getSectionDetail(sectionId, userId) {
-  const section = await Section.findById(sectionId).lean();
-  if (!section) throw new AppError("Section not found", 404);
+  // Content (topics + subtopics) is not user-specific — cache it separately
+  const contentKey = `section:content:${sectionId}`;
+  let content = await cache.get(contentKey);
 
-  const topics = await Topic.find({ section: sectionId })
-    .sort({ order: 1 })
-    .lean();
+  if (!content) {
+    const section = await Section.findById(sectionId).lean();
+    if (!section) throw new AppError("Section not found", 404);
 
-  const topicIds = topics.map((t) => t._id);
-  const subtopics = await Subtopic.find({ topic: { $in: topicIds } })
-    .sort({ order: 1 })
-    .lean();
+    const topics = await Topic.find({ section: sectionId })
+      .sort({ order: 1 })
+      .lean();
 
-  // Group subtopics under their parent topic
-  const subtopicMap = {};
-  for (const st of subtopics) {
-    const key = st.topic.toString();
-    if (!subtopicMap[key]) subtopicMap[key] = [];
-    subtopicMap[key].push(st);
+    const topicIds = topics.map((t) => t._id);
+    const subtopics = await Subtopic.find({ topic: { $in: topicIds } })
+      .sort({ order: 1 })
+      .lean();
+
+    const subtopicMap = {};
+    for (const st of subtopics) {
+      const key = st.topic.toString();
+      if (!subtopicMap[key]) subtopicMap[key] = [];
+      subtopicMap[key].push(st);
+    }
+
+    const topicsWithSubtopics = topics.map((t) => ({
+      ...t,
+      subtopics: subtopicMap[t._id.toString()] || [],
+    }));
+
+    content = { section, topicsWithSubtopics };
+    await cache.set(contentKey, content, TTL_CONTENT);
   }
 
-  const topicsWithSubtopics = topics.map((t) => ({
-    ...t,
-    subtopics: subtopicMap[t._id.toString()] || [],
-  }));
-
-  // Determine if section is unlocked
+  const { section, topicsWithSubtopics } = content;
   const isUnlocked = await isSectionUnlocked(section, userId);
 
   return { ...section, topics: topicsWithSubtopics, isUnlocked };
@@ -66,11 +78,14 @@ async function isSectionUnlocked(section, userId) {
  * Returns lock status for all sections in a track+level for a user.
  */
 async function getSectionsWithLockStatus(trackId, level, userId) {
+  const key = `sections:track:${trackId}:${level}:${userId}`;
+  const hit = await cache.get(key);
+  if (hit) return hit;
+
   const sections = await Section.find({ track: trackId, level })
     .sort({ order: 1 })
     .lean();
 
-  // Get all passed sections for this user in one query
   const passedAttempts = await TestAttempt.find({
     user: userId,
     section: { $in: sections.map((s) => s._id) },
@@ -81,11 +96,14 @@ async function getSectionsWithLockStatus(trackId, level, userId) {
     passedAttempts.map((a) => a.section.toString())
   );
 
-  return sections.map((section, index) => ({
+  const data = sections.map((section, index) => ({
     ...section,
     isUnlocked: index === 0 || passedSectionIds.has(sections[index - 1]._id.toString()),
     isCompleted: passedSectionIds.has(section._id.toString()),
   }));
+
+  await cache.set(key, data, TTL_SECTIONS);
+  return data;
 }
 
 module.exports = { getSectionDetail, isSectionUnlocked, getSectionsWithLockStatus };
