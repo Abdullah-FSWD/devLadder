@@ -1,10 +1,18 @@
 const { Track, Section, Topic, Subtopic, TestAttempt, LearningLog } = require("../models");
+const cache = require("../utils/cache");
+
+const TTL_DASHBOARD = 120; // 2 min
+const TTL_TRACK    = 120; // 2 min
 
 /**
  * Returns full progress overview for a user across all tracks.
  * Used by the dashboard.
  */
 async function getDashboardProgress(userId, experienceLevel) {
+  const key = `progress:dashboard:${userId}:${experienceLevel}`;
+  const hit = await cache.get(key);
+  if (hit) return hit;
+
   const tracks = await Track.find().lean();
   const result = [];
 
@@ -16,20 +24,25 @@ async function getDashboardProgress(userId, experienceLevel) {
     });
   }
 
-  // Overall progress across all tracks
   const totalSections = result.reduce((sum, t) => sum + t.totalSections, 0);
   const completedSections = result.reduce((sum, t) => sum + t.completedSections, 0);
   const overallPercent = totalSections > 0
     ? Math.round((completedSections / totalSections) * 100)
     : 0;
 
-  return { tracks: result, overallPercent };
+  const data = { tracks: result, overallPercent };
+  await cache.set(key, data, TTL_DASHBOARD);
+  return data;
 }
 
 /**
  * Returns progress for a single track at the user's experience level.
  */
 async function getTrackProgress(userId, trackId, experienceLevel) {
+  const key = `progress:track:${trackId}:${userId}:${experienceLevel}`;
+  const hit = await cache.get(key);
+  if (hit) return hit;
+
   const sections = await Section.find({
     track: trackId,
     level: experienceLevel,
@@ -38,12 +51,13 @@ async function getTrackProgress(userId, trackId, experienceLevel) {
     .lean();
 
   if (sections.length === 0) {
-    return { sections: [], totalSections: 0, completedSections: 0, percent: 0 };
+    const empty = { sections: [], totalSections: 0, completedSections: 0, percent: 0 };
+    await cache.set(key, empty, TTL_TRACK);
+    return empty;
   }
 
   const sectionIds = sections.map((s) => s._id);
 
-  // Get all passed tests for these sections in one query
   const passedAttempts = await TestAttempt.find({
     user: userId,
     section: { $in: sectionIds },
@@ -52,7 +66,6 @@ async function getTrackProgress(userId, trackId, experienceLevel) {
 
   const passedSet = new Set(passedAttempts.map((a) => a.section.toString()));
 
-  // Get subtopic counts per section
   const sectionProgress = await Promise.all(
     sections.map(async (section) => {
       const topics = await Topic.find({ section: section._id }).lean();
@@ -61,7 +74,6 @@ async function getTrackProgress(userId, trackId, experienceLevel) {
         topic: { $in: topicIds },
       });
 
-      // Count subtopics that have at least one log
       const loggedSubtopics = await LearningLog.distinct("subtopic", {
         user: userId,
         section: section._id,
@@ -85,17 +97,18 @@ async function getTrackProgress(userId, trackId, experienceLevel) {
   );
 
   const completedSections = sectionProgress.filter((s) => s.isCompleted).length;
-  const percent =
-    sections.length > 0
-      ? Math.round((completedSections / sections.length) * 100)
-      : 0;
+  const percent = sections.length > 0
+    ? Math.round((completedSections / sections.length) * 100)
+    : 0;
 
-  return {
+  const data = {
     sections: sectionProgress,
     totalSections: sections.length,
     completedSections,
     percent,
   };
+  await cache.set(key, data, TTL_TRACK);
+  return data;
 }
 
 module.exports = { getDashboardProgress, getTrackProgress };
