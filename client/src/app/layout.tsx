@@ -24,14 +24,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      {/* Set theme before first paint to prevent flash */}
+    // suppressHydrationWarning: the inline script sets data-theme before React
+    // hydrates, causing a deliberate attribute mismatch — suppress it here.
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
+        {/* Set theme before first paint — default is now "light" */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
           }}
         />
+        {/* Allow env(safe-area-inset-*) for notched phones */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>
       <body>
         <Providers>{children}</Providers>
