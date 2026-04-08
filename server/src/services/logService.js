@@ -28,6 +28,7 @@ async function getLogsBySubtopic(userId, subtopicId) {
 
 async function getLogsBySection(userId, sectionId) {
   return LearningLog.find({ user: userId, section: sectionId })
+    .populate("subtopic", "title")
     .sort({ createdAt: -1 })
     .lean();
 }
