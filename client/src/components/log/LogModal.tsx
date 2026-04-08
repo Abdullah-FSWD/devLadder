@@ -27,7 +27,11 @@ export function LogModal({ open, onClose, subtopicId, subtopicTitle, sectionId }
         timeSpentMinutes: parseInt(minutes, 10),
       }),
     onSuccess: () => {
+      // Invalidate subtopic-level logs (for LogList if used)
       queryClient.invalidateQueries({ queryKey: ["logs", subtopicId] });
+      // Invalidate section-level logs (for the activity panel)
+      queryClient.invalidateQueries({ queryKey: ["logs", "section", sectionId] });
+      // Invalidate progress
       queryClient.invalidateQueries({ queryKey: ["progress-dashboard"] });
       setReport("");
       setMinutes("");
@@ -44,8 +48,8 @@ export function LogModal({ open, onClose, subtopicId, subtopicTitle, sectionId }
     <Modal open={open} onClose={onClose} title="Add Learning Log">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs text-zinc-500 mb-1">Topic</label>
-          <p className="text-sm text-zinc-300">{subtopicTitle}</p>
+          <label className="block text-xs text-zinc-500 mb-1">Subtopic</label>
+          <p className="text-sm text-zinc-200 font-medium">{subtopicTitle}</p>
         </div>
 
         <div>
@@ -58,7 +62,7 @@ export function LogModal({ open, onClose, subtopicId, subtopicTitle, sectionId }
             required
             rows={4}
             maxLength={2000}
-            className="w-full bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-violet-600 transition-colors placeholder:text-zinc-600 resize-none"
+            className="w-full bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600 resize-none"
             placeholder="Summarize what you studied, understood, and practiced..."
           />
           <p className="text-xs text-zinc-600 mt-1 text-right">{report.length}/2000</p>
@@ -75,13 +79,15 @@ export function LogModal({ open, onClose, subtopicId, subtopicTitle, sectionId }
             required
             min={1}
             max={1440}
-            className="w-full bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-violet-600 transition-colors placeholder:text-zinc-600"
+            className="w-full bg-zinc-950 border border-zinc-800 text-zinc-100 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
             placeholder="e.g. 45"
           />
         </div>
 
         {mutation.isError && (
-          <p className="text-xs text-red-400">Failed to save log. Try again.</p>
+          <p className="text-xs text-red-400 bg-red-950/40 border border-red-900/50 rounded-lg px-3 py-2">
+            Failed to save log. Please try again.
+          </p>
         )}
 
         <div className="flex gap-2 pt-1">
