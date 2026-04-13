@@ -1,28 +1,21 @@
 const progressService = require("../services/progressService");
+const asyncHandler = require("../utils/asyncHandler");
 
-async function getDashboard(req, res, next) {
-  try {
-    const progress = await progressService.getDashboardProgress(
-      req.user._id,
-      req.user.experienceLevel
-    );
-    res.json({ success: true, data: progress });
-  } catch (err) {
-    next(err);
-  }
-}
+const getDashboard = asyncHandler(async (req, res) => {
+  const progress = await progressService.getDashboardProgress(
+    req.user._id,
+    req.user.experienceLevel
+  );
+  res.json({ success: true, data: progress });
+});
 
-async function getTrackProgress(req, res, next) {
-  try {
-    const progress = await progressService.getTrackProgress(
-      req.user._id,
-      req.params.trackId,
-      req.user.experienceLevel
-    );
-    res.json({ success: true, data: progress });
-  } catch (err) {
-    next(err);
-  }
-}
+const getTrackProgress = asyncHandler(async (req, res) => {
+  const progress = await progressService.getTrackProgress(
+    req.user._id,
+    req.params.trackId,
+    req.user.experienceLevel
+  );
+  res.json({ success: true, data: progress });
+});
 
 module.exports = { getDashboard, getTrackProgress };
