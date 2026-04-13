@@ -6,6 +6,8 @@ const Subtopic = require("./Subtopic");
 const Test = require("./Test");
 const TestAttempt = require("./TestAttempt");
 const LearningLog = require("./LearningLog");
+const CourseEnrollment = require("./CourseEnrollment");
+const TopicProgress = require("./TopicProgress");
 
 module.exports = {
   User,
@@ -16,4 +18,6 @@ module.exports = {
   Test,
   TestAttempt,
   LearningLog,
+  CourseEnrollment,
+  TopicProgress,
 };
