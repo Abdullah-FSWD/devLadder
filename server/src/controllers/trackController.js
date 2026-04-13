@@ -1,23 +1,16 @@
 const trackService = require("../services/trackService");
 const AppError = require("../utils/AppError");
+const asyncHandler = require("../utils/asyncHandler");
 
-async function getAllTracks(req, res, next) {
-  try {
-    const tracks = await trackService.getAllTracks();
-    res.json({ success: true, data: tracks });
-  } catch (err) {
-    next(err);
-  }
-}
+const getAllTracks = asyncHandler(async (req, res) => {
+  const tracks = await trackService.getAllTracks();
+  res.json({ success: true, data: tracks });
+});
 
-async function getTrackBySlug(req, res, next) {
-  try {
-    const track = await trackService.getTrackBySlug(req.params.slug);
-    if (!track) throw new AppError("Track not found", 404);
-    res.json({ success: true, data: track });
-  } catch (err) {
-    next(err);
-  }
-}
+const getTrackBySlug = asyncHandler(async (req, res) => {
+  const track = await trackService.getTrackBySlug(req.params.slug);
+  if (!track) throw new AppError("Track not found", 404);
+  res.json({ success: true, data: track });
+});
 
 module.exports = { getAllTracks, getTrackBySlug };
