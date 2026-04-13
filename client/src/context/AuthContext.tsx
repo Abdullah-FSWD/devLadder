@@ -16,6 +16,7 @@ interface User {
   email: string;
   experienceLevel: string | null;
   onboardingComplete: boolean;
+  isEmailVerified: boolean;
 }
 
 interface AuthContextValue {
