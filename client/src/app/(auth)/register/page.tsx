@@ -21,7 +21,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register(name, email, password);
-      router.replace("/onboarding");
+      router.replace("/verify-email");
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
