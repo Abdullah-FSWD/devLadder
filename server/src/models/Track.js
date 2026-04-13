@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { TRACK_TYPES } = require("../config/constants");
 
 const trackSchema = new mongoose.Schema(
   {
@@ -12,15 +11,24 @@ const trackSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      enum: TRACK_TYPES,
+      trim: true,
+      lowercase: true,
     },
     description: {
       type: String,
       required: true,
     },
     icon: {
-      type: String, // icon name or URL
+      type: String,
       default: null,
+    },
+    isPublished: {
+      type: Boolean,
+      default: true,
+    },
+    order: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }
