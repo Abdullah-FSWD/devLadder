@@ -6,7 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Badge } from "@/components/ui/Badge";
-import { PageSpinner } from "@/components/ui/Spinner";
+import { Skeleton } from "@/components/ui/Spinner";
 import Link from "next/link";
 import { ArrowRight, Code2, BookOpen } from "lucide-react";
 
@@ -22,7 +22,7 @@ export default function DashboardPage() {
     queryFn: progressApi.dashboard,
   });
 
-  if (isLoading) return <PageSpinner />;
+  if (isLoading) return <DashboardSkeleton />;
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -91,6 +91,31 @@ export default function DashboardPage() {
             </Card>
           )
         )}
+      </div>
+    </div>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="max-w-3xl space-y-6">
+      <div className="space-y-1.5">
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-3 w-24" />
+      </div>
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
+        <Skeleton className="h-4 w-36" />
+        <Skeleton className="h-2 w-full" />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {[1, 2].map((i) => (
+          <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-3">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-1.5 w-full" />
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-8 w-full" />
+          </div>
+        ))}
       </div>
     </div>
   );
