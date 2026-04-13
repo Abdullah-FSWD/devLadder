@@ -4,13 +4,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
-  BookOpen,
-  Code2,
   LogOut,
   X,
   ChevronDown,
   Sun,
   Moon,
+  GraduationCap,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
@@ -21,8 +21,7 @@ import { useState } from "react";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "MERN Track", href: "/track/mern", icon: Code2 },
-  { label: "DSA Track", href: "/track/dsa", icon: BookOpen },
+  { label: "Courses", href: "/courses", icon: GraduationCap },
 ];
 
 const LEVELS = [
@@ -34,9 +33,10 @@ const LEVELS = [
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
+  onLevelChanging?: (loading: boolean) => void;
 }
 
-export function Sidebar({ open, onClose }: SidebarProps) {
+export function Sidebar({ open, onClose, onLevelChanging }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout, setUser } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -48,16 +48,17 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   async function handleLevelChange(level: string) {
     if (level === user?.experienceLevel || switchingLevel) return;
     setSwitchingLevel(true);
+    onLevelChanging?.(true);
     try {
       const updated = await userApi.setLevel(level);
       setUser(updated);
-      // Invalidate all content queries so they re-fetch with new level
       queryClient.invalidateQueries({ queryKey: ["sections"] });
       queryClient.invalidateQueries({ queryKey: ["progress-dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["track"] });
       router.push("/dashboard");
     } finally {
       setSwitchingLevel(false);
+      onLevelChanging?.(false);
       setLevelOpen(false);
     }
   }
@@ -120,22 +121,30 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         {/* Level switcher */}
         <div className="relative">
           <button
-            onClick={() => setLevelOpen((p) => !p)}
+            onClick={() => !switchingLevel && setLevelOpen((p) => !p)}
             className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-zinc-800 transition-colors"
           >
             <div className="text-left">
               <p className="text-xs text-zinc-500 leading-none mb-0.5">Level</p>
               <p className="text-sm font-medium text-zinc-200 capitalize">
-                {user?.experienceLevel ?? "—"}
+                {switchingLevel ? (
+                  <span className="text-violet-400">Switching…</span>
+                ) : (
+                  user?.experienceLevel ?? "—"
+                )}
               </p>
             </div>
-            <ChevronDown
-              size={14}
-              className={cn(
-                "text-zinc-500 transition-transform",
-                levelOpen && "rotate-180"
-              )}
-            />
+            {switchingLevel ? (
+              <Loader2 size={14} className="text-violet-400 animate-spin shrink-0" />
+            ) : (
+              <ChevronDown
+                size={14}
+                className={cn(
+                  "text-zinc-500 transition-transform",
+                  levelOpen && "rotate-180"
+                )}
+              />
+            )}
           </button>
 
           {levelOpen && (
