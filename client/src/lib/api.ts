@@ -48,6 +48,12 @@ export const authApi = {
   logout: () => api.post("/auth/logout"),
 
   me: () => api.get("/auth/me").then((r) => r.data.data.user),
+
+  verifyEmail: (token: string) =>
+    api.get(`/auth/verify-email/${token}`).then((r) => r.data.data.user),
+
+  resendVerification: () =>
+    api.post("/auth/resend-verification").then((r) => r.data.data),
 };
 
 // ── Users ─────────────────────────────────────────────────────
@@ -98,6 +104,24 @@ export const progressApi = {
   dashboard: () => api.get("/progress").then((r) => r.data.data),
   track: (trackId: string) =>
     api.get(`/progress/track/${trackId}`).then((r) => r.data.data),
+};
+
+// ── Courses ───────────────────────────────────────────────────
+export const courseApi = {
+  list: () => api.get("/courses").then((r) => r.data.data),
+  get: (id: string) => api.get(`/courses/${id}`).then((r) => r.data.data),
+  unlock: (id: string) =>
+    api.post(`/courses/${id}/unlock`).then((r) => r.data.data),
+};
+
+// ── Topic Progress ────────────────────────────────────────────
+export const topicProgressApi = {
+  forSection: (sectionId: string) =>
+    api.get(`/topics/section/${sectionId}`).then((r) => r.data.data),
+  complete: (topicId: string) =>
+    api.post(`/topics/${topicId}/complete`).then((r) => r.data.data),
+  uncomplete: (topicId: string) =>
+    api.delete(`/topics/${topicId}/complete`).then((r) => r.data.data),
 };
 
 export default api;
