@@ -59,6 +59,8 @@ app.use("/api/sections", require("./routes/sections"));
 app.use("/api/logs", require("./routes/logs"));
 app.use("/api/tests", require("./routes/tests"));
 app.use("/api/progress", require("./routes/progress"));
+app.use("/api/courses", require("./routes/courses"));
+app.use("/api/topics", require("./routes/topicProgress"));
 
 // Health check
 app.get("/api/health", (_req, res) => {
