@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const { setExperienceLevel } = require("../controllers/userController");
-const validate = require("../middleware/validate");
+const { validate } = require("../middleware/validate");
 const { setLevelSchema } = require("../validators/user");
 const { authenticate } = require("../middleware/auth");
 
