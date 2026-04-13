@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { userApi } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
@@ -34,14 +34,13 @@ export default function OnboardingPage() {
   const { user, loading: authLoading, setUser } = useAuth();
   const router = useRouter();
 
-  if (!authLoading && !user) {
-    router.replace("/login");
-    return null;
-  }
-  if (!authLoading && user?.onboardingComplete) {
-    router.replace("/dashboard");
-    return null;
-  }
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) router.replace("/login");
+    else if (user.onboardingComplete) router.replace("/dashboard");
+  }, [authLoading, user, router]);
+
+  if (authLoading || !user || user.onboardingComplete) return null;
 
   async function handleContinue() {
     if (!selected) return;
