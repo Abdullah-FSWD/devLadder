@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const AppError = require("../utils/AppError");
 
 /**
@@ -18,4 +19,19 @@ function validate(schema) {
   };
 }
 
-module.exports = validate;
+/**
+ * Validates that the given route param names are valid MongoDB ObjectIds.
+ * Usage: validateObjectId("id")  or  validateObjectId("trackId", "sectionId")
+ */
+function validateObjectId(...params) {
+  return (req, res, next) => {
+    for (const param of params) {
+      if (!mongoose.Types.ObjectId.isValid(req.params[param])) {
+        return next(new AppError(`Invalid ID: ${param}`, 400));
+      }
+    }
+    next();
+  };
+}
+
+module.exports = { validate, validateObjectId };
