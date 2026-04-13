@@ -3,7 +3,7 @@
 import { use } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { trackApi, sectionApi } from "@/lib/api";
-import { PageSpinner } from "@/components/ui/Spinner";
+import { Skeleton } from "@/components/ui/Spinner";
 import { Badge } from "@/components/ui/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Lock, CheckCircle2, ChevronRight } from "lucide-react";
@@ -24,7 +24,7 @@ export default function TrackPage({ params }: { params: Promise<{ slug: string }
     enabled: !!track?._id,
   });
 
-  if (trackLoading || sectionsLoading) return <PageSpinner />;
+  if (trackLoading || sectionsLoading) return <TrackSkeleton />;
 
   const completed = sections?.filter((s: SectionItem) => s.isCompleted).length ?? 0;
   const total = sections?.length ?? 0;
@@ -67,6 +67,23 @@ interface SectionItem {
   order: number;
   isUnlocked: boolean;
   isCompleted: boolean;
+}
+
+function TrackSkeleton() {
+  return (
+    <div className="max-w-2xl space-y-6">
+      <div className="space-y-2">
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-3 w-64" />
+      </div>
+      <Skeleton className="h-16 w-full" />
+      <div className="space-y-2">
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} className="h-14 w-full" />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function SectionCard({
