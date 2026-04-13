@@ -1,5 +1,5 @@
 const authService = require("../services/authService");
-const { jwt: jwtConfig } = require("../config/env");
+const asyncHandler = require("../utils/asyncHandler");
 
 const REFRESH_COOKIE_OPTIONS = {
   httpOnly: true,
@@ -9,53 +9,43 @@ const REFRESH_COOKIE_OPTIONS = {
   path: "/api/auth/refresh",
 };
 
-async function register(req, res, next) {
-  try {
-    const { user, accessToken, refreshToken } = await authService.register(
-      req.validated
-    );
-    res.cookie("refreshToken", refreshToken, REFRESH_COOKIE_OPTIONS);
-    res.status(201).json({ success: true, data: { user, accessToken } });
-  } catch (err) {
-    next(err);
-  }
-}
+const register = asyncHandler(async (req, res) => {
+  const { user, accessToken, refreshToken } = await authService.register(req.validated);
+  res.cookie("refreshToken", refreshToken, REFRESH_COOKIE_OPTIONS);
+  res.status(201).json({ success: true, data: { user, accessToken } });
+});
 
-async function login(req, res, next) {
-  try {
-    const { user, accessToken, refreshToken } = await authService.login(
-      req.validated
-    );
-    res.cookie("refreshToken", refreshToken, REFRESH_COOKIE_OPTIONS);
-    res.json({ success: true, data: { user, accessToken } });
-  } catch (err) {
-    next(err);
-  }
-}
+const login = asyncHandler(async (req, res) => {
+  const { user, accessToken, refreshToken } = await authService.login(req.validated);
+  res.cookie("refreshToken", refreshToken, REFRESH_COOKIE_OPTIONS);
+  res.json({ success: true, data: { user, accessToken } });
+});
 
-async function refresh(req, res, next) {
-  try {
-    const token = req.cookies.refreshToken;
-    const { accessToken, refreshToken } = await authService.refresh(token);
-    res.cookie("refreshToken", refreshToken, REFRESH_COOKIE_OPTIONS);
-    res.json({ success: true, data: { accessToken } });
-  } catch (err) {
-    next(err);
-  }
-}
+const refresh = asyncHandler(async (req, res) => {
+  const token = req.cookies.refreshToken;
+  const { accessToken, refreshToken } = await authService.refresh(token);
+  res.cookie("refreshToken", refreshToken, REFRESH_COOKIE_OPTIONS);
+  res.json({ success: true, data: { accessToken } });
+});
 
-async function logout(req, res, next) {
-  try {
-    await authService.logout(req.user._id);
-    res.clearCookie("refreshToken", { path: "/api/auth/refresh" });
-    res.json({ success: true, message: "Logged out" });
-  } catch (err) {
-    next(err);
-  }
-}
+const logout = asyncHandler(async (req, res) => {
+  await authService.logout(req.user._id);
+  res.clearCookie("refreshToken", { path: "/api/auth/refresh" });
+  res.json({ success: true, message: "Logged out" });
+});
 
-async function me(req, res) {
+function me(req, res) {
   res.json({ success: true, data: { user: req.user } });
 }
 
-module.exports = { register, login, refresh, logout, me };
+const verifyEmail = asyncHandler(async (req, res) => {
+  const user = await authService.verifyEmail(req.params.token);
+  res.json({ success: true, data: { user } });
+});
+
+const resendVerification = asyncHandler(async (req, res) => {
+  const result = await authService.resendVerification(req.user._id);
+  res.json({ success: true, data: result });
+});
+
+module.exports = { register, login, refresh, logout, me, verifyEmail, resendVerification };
