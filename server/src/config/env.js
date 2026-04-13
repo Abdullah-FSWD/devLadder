@@ -12,4 +12,11 @@ module.exports = {
   clientUrl: process.env.CLIENT_URL,
   nodeEnv: process.env.NODE_ENV || "development",
   redisUrl: process.env.REDIS_URL || null,
+  email: {
+    host: process.env.EMAIL_HOST,
+    port: parseInt(process.env.EMAIL_PORT, 10) || 587,
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+    from: process.env.EMAIL_FROM || "DevLadder <no-reply@devladder.app>",
+  },
 };
