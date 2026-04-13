@@ -18,3 +18,9 @@ export function PageSpinner() {
     </div>
   );
 }
+
+export function Skeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn("animate-pulse rounded-lg bg-zinc-800", className)} />
+  );
+}
