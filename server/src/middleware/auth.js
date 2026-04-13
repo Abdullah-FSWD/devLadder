@@ -42,4 +42,15 @@ function requireOnboarding(req, res, next) {
   next();
 }
 
-module.exports = { authenticate, requireOnboarding };
+/**
+ * Requires the user's email to be verified.
+ * Must be used after authenticate middleware.
+ */
+function requireEmailVerified(req, res, next) {
+  if (!req.user.isEmailVerified) {
+    return next(new AppError("Please verify your email address first", 403));
+  }
+  next();
+}
+
+module.exports = { authenticate, requireOnboarding, requireEmailVerified };
